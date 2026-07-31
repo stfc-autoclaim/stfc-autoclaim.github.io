@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STFC Claim Free Offers — Stop Missing Free Gifts</title>
+<meta name="description" content="A free browser extension that automatically claims free gifts on the Star Trek Fleet Command web store. Install it, log in, and leave the tab open — that's it.">
+<link rel="icon" href="images/delta-green.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg-top: #0f172a;
+    --bg-bottom: #1a2744;
+    --green: #22c55e;
+    --green-bright: #4ade80;
+    --red: #f87171;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --border: rgba(148, 163, 184, 0.15);
+    --card-bg: rgba(255, 255, 255, 0.03);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    background-attachment: fixed;
+    line-height: 1.6;
+  }
+
+  img { max-width: 100%; display: block; }
+
+  a { color: var(--green-bright); }
+
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Hero ---------- */
+  header.hero {
+    padding: 72px 0 48px;
+    text-align: center;
+  }
+
+  .hero-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+  }
+
+  .eyebrow {
+    color: var(--green-bright);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 48px);
+    margin: 0 0 36px;
+    line-height: 1.15;
+  }
+
+  /* ---------- Free badge row ---------- */
+  .trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 32px;
+    justify-content: center;
+    margin-bottom: 36px;
+    color: var(--text-dim);
+    font-size: clamp(16px, 2.5vw, 22px);
+  }
+
+  .trust-row .item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .trust-row .check {
+    color: var(--green-bright);
+    font-weight: 700;
+  }
+
+  .store-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .store-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 30px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--green-bright), var(--green));
+    color: #06210f;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 17px;
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    box-shadow: 0 8px 24px -8px rgba(34, 197, 94, 0.5);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+
+  .store-button:hover {
+    background: linear-gradient(180deg, #6ee7a3, var(--green-bright));
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -6px rgba(34, 197, 94, 0.65);
+  }
+
+  .store-button:active {
+    transform: translateY(0);
+  }
+
+  .store-button .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .store-button.secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .store-button.secondary:hover {
+    background: var(--card-bg);
+    border-color: var(--green);
+  }
+
+  /* ---------- Banner image ---------- */
+  .banner {
+    max-width: 960px;
+    margin: 0 auto 8px;
+    padding: 0 24px;
+  }
+  .banner img {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    width: 100%;
+  }
+
+  /* ---------- Sections ---------- */
+  section {
+    padding: 56px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  section h2 {
+    font-size: 26px;
+    margin: 0 0 8px;
+    text-align: center;
+  }
+
+  .section-sub {
+    text-align: center;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto 36px;
+  }
+
+  /* ---------- Features grid ---------- */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+
+  .feature-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .feature-card .icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .feature-card h3 {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  .feature-card p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+
+  /* ---------- Screenshots ---------- */
+  .screens {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  figure {
+    margin: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  figure img {
+    display: block;
+    width: 100%;
+  }
+
+  figcaption {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ---------- How it works: steps ---------- */
+  .steps-grid {
+    display: flex;
+    flex-direction: column;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .state-lead {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 32px 0 24px;
+  }
+
+  .step-card {
+    display: flex;
+    gap: 26px;
+    padding: 30px 0;
+    position: relative;
+  }
+
+  .step-card:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 29px;
+    top: 90px;
+    bottom: -10px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .step-num {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid var(--green);
+    color: var(--green-bright);
+    font-weight: 700;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step-content {
+    padding-top: 8px;
+    min-width: 0;
+  }
+
+  .step-content h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+  }
+
+  .step-content p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 16px;
+  }
+
+  /* ---------- Status explainer (real screenshots) ---------- */
+  .state-explain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .state-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .popup-crop {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .popup-crop img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: 88% 12%;
+    transform: scale(2.3);
+    transform-origin: 88% 12%;
+  }
+
+  .state-card-body {
+    padding: 16px 18px;
+  }
+
+  .state-card h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+    font-size: 15px;
+  }
+
+  .state-card p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot.on { background: var(--green-bright); box-shadow: 0 0 8px var(--green-bright); }
+  .dot.off { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+  /* ---------- Video placeholder ---------- */
+  .video-placeholder {
+    max-width: 720px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    background: var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 24px;
+  }
+
+  .video-placeholder .play {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green-bright);
+    font-size: 22px;
+  }
+
+  /* ---------- Disclaimer ---------- */
+  .disclaimer {
+    background: rgba(248, 113, 113, 0.06);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    border-radius: 12px;
+    padding: 28px 32px;
+    max-width: 720px;
+    margin: 64px auto 0;
+  }
+
+  .disclaimer h3 {
+    margin: 0 0 12px;
+    color: #fca5a5;
+    font-size: 15px;
+  }
+
+  .disclaimer p {
+    margin: 0 0 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .not-do {
+    max-width: 720px;
+    margin: 24px auto 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .not-do ul {
+    padding-left: 20px;
+    margin: 14px 0 0;
+  }
+
+  .not-do li { margin-bottom: 12px; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    padding: 40px 0 60px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer a { color: var(--text-dim); text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    header.hero { padding: 48px 0 32px; }
+    section { padding: 40px 0; }
+  }
+
+  /* ---------- Lightbox ---------- */
+  .screens figure { cursor: pointer; }
+
+  .screens figure img { transition: opacity 0.15s ease; }
+
+  .screens figure:hover img { opacity: 0.85; }
+
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 16, 0.92);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 32px;
+  }
+
+  .lightbox.open { display: flex; }
+
+  .lightbox-img {
+    max-width: 88vw;
+    max-height: 78vh;
+    border-radius: 10px;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.6);
+  }
+
+  .lightbox-caption {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin: 16px 0 0;
+    text-align: center;
+  }
+
+  .lightbox-close,
+  .lightbox-nav {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-close:hover,
+  .lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: var(--green);
+  }
+
+  .lightbox-close {
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 22px;
+  }
+
+  .lightbox-nav {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 20px;
+  }
+
+  .lightbox-nav.prev { left: 20px; }
+  .lightbox-nav.next { right: 20px; }
+
+  @media (max-width: 600px) {
+    .lightbox-nav { width: 40px; height: 40px; }
+    .lightbox-nav.prev { left: 8px; }
+    .lightbox-nav.next { right: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <img class="hero-icon" src="images/delta-green.svg" alt="STFC Claim Free Offers icon">
+    <p class="eyebrow">For Star Trek Fleet Command</p>
+    <h1>Stop Missing<br>Free Gifts</h1>
+    <div class="trust-row">
+      <span class="item"><span class="check">✓</span> 100% Free</span>
+      <span class="item"><span class="check">✓</span> No separate account — uses your STFC login</span>
+    </div>
+    <div class="store-buttons">
+      <a class="store-button" href="https://addons.mozilla.org/en-US/firefox/addon/stfc-claim-free-offers/" target="_blank" rel="noopener">
+        <span class="btn-icon">🦊</span> Get it for Firefox
+      </a>
+      <a class="store-button" href="https://chromewebstore.google.com/detail/stfc-claim-free-offers/lbjpbhcojdhfginplmhfapkmfbplnaek" target="_blank" rel="noopener">
+        <img class="chrome-icon btn-icon" src="images/chrome-logo.svg" width="26" height="26" alt="">
+        Add to Chrome
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="banner">
+  <img src="images/screenshot-on.jpg" alt="STFC Claim Free Offers popup shown live on the STFC store, with a gift just claimed">
+</div>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <h2>How It Works</h2>
+    <p class="section-sub">No settings to learn, no accounts to create. Three steps and you're done.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Install the extension</h3>
+          <p>One click from the Firefox or Chrome links above. Takes about 10 seconds.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Log in to the STFC store</h3>
+          <p>Open the store and log in the way you always do — nothing changes here.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Leave the tab open</h3>
+          <p>That's it. Free gifts get grabbed the moment they show up, even if you're not watching.</p>
+        </div>
+      </div>
+    </div>
+    <p class="state-lead">Once it's running, the toolbar icon tells you everything you need to know:</p>
+    <div class="state-explain">
+      <div class="state-card">
+        <div class="popup-crop"><img src="images/screenshot-on.jpg" alt="Extension icon glowing green, a gift has just been claimed"></div>
+        <div class="state-card-body">
+          <h4><span class="dot on"></span> Green means it's working</h4>
+          <p>Free gifts are being claimed automatically. There's nothing else to do.</p>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="popup-crop"><img src="images/screenshot-off.jpg" alt="Extension icon red, auto-claiming paused"></div>
+        <div class="state-card-body">
+          <h4><span class="dot off"></span> Red means it's paused</h4>
+          <p>Auto-claiming is off. One click on the icon turns it back on.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Why People Use It</h2>
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-head"><div class="icon">🎁</div><h3>More free gifts over time</h3></div>
+        <p>Chests like the 10-minute and 4-hour ones only reset once claimed. Check in occasionally and you're leaving claims on the table — this claims each one the moment it's ready.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-head"><div class="icon">⚡</div><h3>Works in the background</h3></div>
+        <p>Leave the store tab open and go about your day. No need to watch it or babysit anything.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-head"><div class="icon">🔀</div><h3>One-click on/off</h3></div>
+        <p>Click the toolbar icon to pause or resume anytime. That's the whole interface — nothing to configure.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-head"><div class="icon">🔒</div><h3>Never touches your login</h3></div>
+        <p>Doesn't see your password and doesn't collect any data about your account.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-head"><div class="icon">💸</div><h3>Completely free</h3></div>
+        <p>No ads, no premium tier, no in-app purchases. Just install it and use it.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-head"><div class="icon">🖥️</div><h3>Any major browser</h3></div>
+        <p>Chrome, Firefox, Edge, or Brave — same extension, same experience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="screenshots">
+  <div class="wrap">
+    <h2>See It In Action</h2>
+    <p class="section-sub">Real screenshots from real play sessions — no mockups.</p>
+    <div class="screens">
+      <figure tabindex="0" role="button" aria-label="View larger image">
+        <img src="images/screenshot-on.jpg" alt="A free gift claimed automatically on the STFC store">
+        <figcaption>A free gift, claimed automatically</figcaption>
+      </figure>
+      <figure tabindex="0" role="button" aria-label="View larger image">
+        <img src="images/screenshot-off.jpg" alt="Extension popup showing auto-claiming paused on the STFC store">
+        <figcaption>Paused — one click turns it back on</figcaption>
+      </figure>
+      <figure tabindex="0" role="button" aria-label="View larger image">
+        <img src="images/chests-15.jpg" alt="Chest summary screen showing rewards from 15 chests opened">
+        <figcaption>15 free gifts claimed without lifting a finger</figcaption>
+      </figure>
+      <figure tabindex="0" role="button" aria-label="View larger image">
+        <img src="images/chest-1.jpg" alt="Chest summary screen showing 5,000 Tritanium from 1 chest opened">
+        <figcaption>In-game notification confirming claim</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="video">
+  <div class="wrap">
+    <h2>Prefer to Watch?</h2>
+    <p class="section-sub">A quick video walkthrough is on the way.</p>
+    <!-- Replace this .video-placeholder div with an <iframe> (YouTube) or <video> tag once a walkthrough video exists. -->
+    <div class="video-placeholder">
+      <div class="play">▶</div>
+      <span>Video coming soon</span>
+    </div>
+  </div>
+</section>
+
+<section id="disclaimer">
+  <div class="wrap">
+    <h2>Keep In Mind</h2>
+    <div class="not-do">
+      <strong>What it doesn't do:</strong>
+      <ul>
+        <li>Doesn't store or see your Scopely login credentials</li>
+        <li>Doesn't touch any page or tab outside the STFC web store</li>
+        <li>Doesn't purchase or claim paid offers — only free gifts with a "Claim" button</li>
+        <li>Doesn't run when your browser is closed — the store tab needs to stay open</li>
+      </ul>
+    </div>
+    <div class="disclaimer">
+      <h3>It does its best — but nothing's perfect</h3>
+      <p>
+        Once in a while — during game maintenance, if your login session times out, or if the store is
+        open in two tabs at once — a gift might get missed. Just refresh the page and it picks right back up.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      STFC Claim Free Offers is an independent, unofficial fan-made tool and is not affiliated with
+      Scopely or Star Trek Fleet Command.
+    </p>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+  <button class="lightbox-nav prev" id="lightboxPrev" aria-label="Previous image">&#10094;</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav next" id="lightboxNext" aria-label="Next image">&#10095;</button>
+  <p class="lightbox-caption" id="lightboxCaption"></p>
+</div>
+
+<script>
+(function () {
+  var figures = Array.prototype.slice.call(document.querySelectorAll('#screenshots figure'));
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImg = document.getElementById('lightboxImg');
+  var lightboxCaption = document.getElementById('lightboxCaption');
+  var current = 0;
+
+  function openAt(index) {
+    current = index;
+    var fig = figures[current];
+    var img = fig.querySelector('img');
+    var caption = fig.querySelector('figcaption');
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightboxCaption.textContent = caption ? caption.textContent : '';
+    lightbox.classList.add('open');
+  }
+
+  function close() {
+    lightbox.classList.remove('open');
+    lightboxImg.src = '';
+  }
+
+  function show(delta) {
+    openAt((current + delta + figures.length) % figures.length);
+  }
+
+  figures.forEach(function (fig, i) {
+    fig.addEventListener('click', function () { openAt(i); });
+    fig.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openAt(i);
+      }
+    });
+  });
+
+  document.getElementById('lightboxClose').addEventListener('click', close);
+  document.getElementById('lightboxPrev').addEventListener('click', function () { show(-1); });
+  document.getElementById('lightboxNext').addEventListener('click', function () { show(1); });
+
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox) close();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') show(-1);
+    if (e.key === 'ArrowRight') show(1);
+  });
+})();
+</script>
+
+</body>
+</html>
